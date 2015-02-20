@@ -32,7 +32,6 @@ Plugin 'scrooloose/syntastic'
 Plugin 'nathanaelkane/vim-indent-guides'
 Plugin 'mhinz/vim-signify'
 " Plugin 'davidhalter/jedi-vim'
-" Plugin 'airblade/vim-gitgutter'
 
 call vundle#end()
 filetype plugin indent on
@@ -155,11 +154,10 @@ if has("gui_running")
     colorscheme solarized
 endif
 
-" function
-
 " Xml auto indent command 'gg=G'
 au FileType xml setlocal equalprg=xmllint\ --format\ --recover\ -\ 2>/dev/null
 
+" function
 function! DoPrettyXML()
   " save the filetype so we can restore it later
   let l:origft = &ft
