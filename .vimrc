@@ -129,6 +129,9 @@ set cc=+1
 " Definition de l'affichage des caracteres invisibles avec 'set list'
 " set listchars=nbsp:
 
+" Affichage surbrillance recherche
+set hlsearch
+
 " Indentation respectant le format de developpement
 set smartindent
 set tabstop=4
