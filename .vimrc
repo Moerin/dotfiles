@@ -1,14 +1,16 @@
+" Vimrc configuration file
 " Version : 2015-09
 
 " Vundle configuration
 "-----------------------------------
 set nocompatible
 filetype off
+
 set rtp+=~/.vim/bundle/Vundle.vim
 call vundle#begin()
 
 " Vundle management (for updates)
-Plugin 'gmarik/vundle'
+#Plugin 'gmarik/Vundle.vim'
 
 " List of bundles (or extensions)
 "-----------------------------------
@@ -30,9 +32,14 @@ Plugin 'honza/vim-snippets'
 Plugin 'scrooloose/syntastic'
 Plugin 'nathanaelkane/vim-indent-guides'
 Plugin 'mhinz/vim-signify'
-Plugin 'kien/ctrlp.vim'
 Plugin 'majutsushi/tagbar'
+Plugin 'joonty/vim-taggatron'
+Plugin 'vim-scripts/BufOnly.vim'
+Plugin 'chrisbra/csv.vim'
+Plugin 'Xuyuanp/nerdtree-git-plugin'
+Plugin 'kien/ctrlp.vim'
 Plugin 'c.vim'
+" Plugin 'jistr/vim-nerdtree-tabs'
 
 call vundle#end()
 filetype plugin indent on
@@ -50,6 +57,9 @@ let g:ycm_seed_identifiers_with_syntax = 1 " Completion for programming
 let g:ycm_complete_in_comments = 1 " Completion in comments
 let g:ycm_complete_in_strings = 1 " Completion in strings
 let g:airline_powerline_fonts = 1 
+let g:airline#extensions#tabline#enabled=1
+set t_Co=256
+set guifont=DejaVu\ Sans\ Mono\ for\ Powerline\ 10
 
 " CtrlP setup
 " -----------------------------------
@@ -66,6 +76,10 @@ nmap <F8> :TagbarToggle<CR>
 let NERDTreeIgnore = ['\.pyc$']
 " AutoClose
 autocmd bufenter * if (winnr("$") == 1 && exists("b:NERDTreeType") && b:NERDTreeType == "primary") | q | endif
+" Bookmark
+let NERDTreeShowBookmarks=1
+" Mirroring between tabs
+let NERDTreeMirror=0
 
 " UltiSnips
 " ----------------------------------
@@ -106,6 +120,68 @@ let g:pymode_rope_completion = 0
 " c.vim setup
 " ----------------------------------
 let g:C_UseTool_cmake    = 'yes'
+
+" Ultisnips setup
+" ----------------------------------
+let g:UltiSnipsExpandTrigger = '<c-j>'
+let g:UltiSnipsListSnippets = '<c-tab>'
+let g:UltiSnipsJumpForwardTrigger = '<c-j>'
+let g:UltiSnipsJumpBackwardTrigger = '<c-k>'
+
+" Vim-indent-guides
+" ----------------------------------
+set background=dark
+colorscheme solarized
+set ts=4 sw=4 et
+let g:indent_guides_start_level = 2
+let g:indent_guides_guide_size = 1
+
+" Function enable indentguide
+augroup IndentGuides
+    autocmd!
+    autocmd VimEnter * IndentGuidesEnable
+augroup END
+
+" Syntactic
+" ----------------------------------
+set statusline+=%#warningmsg#
+set statusline+=%{SyntasticStatuslineFlag()}
+set statusline+=%*
+let g:syntastic_always_populate_loc_list = 0
+let g:syntastic_auto_loc_list = 0
+let g:syntastic_check_on_open = 1
+let g:syntastic_check_on_w = 1
+let g:syntastic_python_checkers = ['python', 'pylint', 'pep8']
+let g:syntastic_auto_jump = 2 
+
+" Pymode setup
+" ----------------------------------
+let g:pymode = 0
+let g:pymode_folding = 1
+let g:pymode_rope_completion = 0
+let g:pymode_breakpoint_cmd = 'import ipdb; ipdb.set_trace() # XXX BREAKPOINT'
+let g:pymode_lint = 0
+" let g:pymode_lint_write = 0
+
+" Vim taggatron
+" ----------------------------------
+let g:tagcommands = {
+\    "php" : {
+\        "tagfile" : "/home/sebastien/workspace/svn/lengow/php.tags",
+\        "args" : "-R",
+\        "files" : "/home/sebastien/workspace/svn/lengow/"
+\    }
+\}
+
+let g:pymode = 0
+" Signify setup
+" ----------------------------------
+nmap <leader>gj <plug>(signify-next-hunk)
+nmap <leader>gk <plug>(signify-prev-hunk)
+
+" TagBar setup
+" ----------------------------------
+nmap <F8> :TagbarToggle<CR>
 
 " General
 " ----------------------------------
@@ -155,6 +231,9 @@ set cc=+1
 
 " Definition de l'affichage des caracteres invisibles avec 'set list'
 " set listchars=nbsp:
+ 
+" Affichage surbrillance recherche
+set hlsearch
 
 " Affichage surbrillance recherche
 set hlsearch
@@ -222,3 +301,13 @@ function! DoPrettyXML()
 endfunction
 
 command! PrettyXML call DoPrettyXML()set secure
+
+" PHP tags
+set tags=~/workspace/svn/lengow/php.tags
+
+" C compilation
+set makeprg=make\ -C\ ../build\ -j9
+nnoremap <F4> :make!<cr>
+
+" Backspace correction
+set backspace=indent,eol,start
