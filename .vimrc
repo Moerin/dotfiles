@@ -1,5 +1,6 @@
 " Vimrc configuration file
-" Version : 2015-06
+" Version : 2015-09
+
 " Vundle configuration
 "-----------------------------------
 set nocompatible
@@ -31,8 +32,8 @@ Plugin 'honza/vim-snippets'
 Plugin 'scrooloose/syntastic'
 Plugin 'nathanaelkane/vim-indent-guides'
 Plugin 'mhinz/vim-signify'
-Plugin 'joonty/vim-taggatron'
 Plugin 'majutsushi/tagbar'
+Plugin 'joonty/vim-taggatron'
 Plugin 'vim-scripts/BufOnly.vim'
 Plugin 'chrisbra/csv.vim'
 Plugin 'Xuyuanp/nerdtree-git-plugin'
@@ -44,21 +45,30 @@ call vundle#end()
 filetype plugin indent on
 
 " Airline setup
-"-----------------------------------
+" -----------------------------------
 set laststatus=2
 set statusline+=%{fugitive#statusline()}
-let g:airline_powerline_fonts=1
+let g:ycm_global_ycm_extra_conf = '~/.vim/bundle/YouCompleteMe/.ycm_extra_conf.py'
+let g:ycm_collect_identifiers_from_tags_files = 1 " Let YCM read tags from
+" Ctags file
+let g:ycm_use_ultisnips_completer = 1 " Default 1, just ensure
+let g:ycm_seed_identifiers_with_syntax = 1 " Completion for programming
+" language's keyword
+let g:ycm_complete_in_comments = 1 " Completion in comments
+let g:ycm_complete_in_strings = 1 " Completion in strings
+let g:airline_powerline_fonts = 1 
 let g:airline#extensions#tabline#enabled=1
 set t_Co=256
 set guifont=DejaVu\ Sans\ Mono\ for\ Powerline\ 10
 
-" Vimwiki setup
-" ----------------------------------
-let g:vimwiki_list=[{'path':'~/.vim/vimwiki'}]
+" CtrlP setup
+" -----------------------------------
+let g:ctrlp_map = '<c-p>'
+let g:ctrlp_cmd = 'CtrlP'
 
-" YCM setup
+" TagBar setup
 " ----------------------------------
-let g:ycm_global_ycm_extra_conf = '~/.vim/bundle/YouCompleteMe/third_party/ycmd/cpp/ycm/.ycm_extra_conf.py'
+nmap <F8> :TagbarToggle<CR>
 
 " NERDTree setup
 " ----------------------------------
@@ -145,6 +155,34 @@ let g:UltiSnipsJumpBackwardTrigger = '<c-k>'
 " General
 " ----------------------------------
 syntax on
+se t_Co=16
+let g:solarized_termcolors=256  
+set background=dark  
+colorscheme solarized
+
+"" Buffers - explore/next/previous: Alt-F12, F12, Shift-F12.
+nnoremap <silent> <M-F12> :BufExplorer<CR>
+nnoremap <silent> <F12> :bn<CR>
+nnoremap <silent> <S-F12> :bp<CR>
+
+" Put plugins and dictionaries in this dir (also on Windows)
+let vimDir = '$HOME/.vim'
+let &runtimepath.=','.vimDir
+
+" Keep undo history across sessions by storing it in a file
+if has('persistent_undo')
+    let myUndoDir = expand(vimDir . '/undodir')
+    " Create dirs
+    call system('mkdir ' . vimDir)
+    call system('mkdir ' . myUndoDir)
+    let &undodir = myUndoDir
+    set undofile
+endif
+
+set undodir=~/.vim/undodir
+set undofile
+set undolevels=1000 "maximum number of changes that can be undone
+set undoreload=10000 "maximum number lines to save for undo on a buffer reload
 
 " Shortkeys loading
 "-----------------------------------
@@ -160,9 +198,12 @@ set textwidth=80
 " Surligne la colonne du dernier caractere autorise par textwidth
 set cc=+1
 
-" Definition de l'affichage des caracteres invisbles avec 'set list'
+" Definition de l'affichage des caracteres invisibles avec 'set list'
 " set listchars=nbsp:
  
+" Affichage surbrillance recherche
+set hlsearch
+
 " Affichage surbrillance recherche
 set hlsearch
 
@@ -177,13 +218,18 @@ autocmd FileType python set sw=4
 autocmd FileType python set ts=4
 autocmd FileType python set sts=4
 
+" Coloris en rouge les fins de ligne
+autocmd InsertEnter * syn clear EOLWS | syn match EOLWS excludenl /\s\+\%#\@!$/
+autocmd InsertLeave * syn clear EOLWS | syn match EOLWS excludenl /\s\+$/
+highlight EOLWS ctermbg=red guibg=red
+
 " Permet d'utiliser des .vimrc par projets et eviter les commandes dangereuses
-set exrc
-set secure
+"set exrc
+"set secure
 
 " format JSON
 command! FormatJSON %!python -m json.tool
- 
+
 " Solarized conf
 if has("gui_running")
     syntax enable
@@ -193,6 +239,37 @@ endif
 
 " Xml auto indent command 'gg=G'
 au FileType xml setlocal equalprg=xmllint\ --format\ --recover\ -\ 2>/dev/null
+
+" function
+function! DoPrettyXML()
+  " save the filetype so we can restore it later
+  let l:origft = &ft
+  set ft=
+  " delete the xml header if it exists. This will
+  " permit us to surround the document with fake tags
+  " without creating invalid xml.
+  1s/<?xml .*?>//e
+  " insert fake tags around the entire document.
+  " This will permit us to pretty-format excerpts of
+  " XML that may contain multiple top-level elements.
+  0put ='<PrettyXML>'
+  $put ='</PrettyXML>'
+  silent %!xmllint --format -
+  " xmllint will insert an <?xml?> header. it's easy enough to delete
+  " if you don't want it.
+  " delete the fake tags
+  2d
+  $d
+  " restore the 'normal' indentation, which is one extra level
+  " too deep due to the extra tags we wrapped around the document.
+  silent %<
+  " back to home
+  1
+  " restore the filetype
+  exe "set ft=" . l:origft
+endfunction
+
+command! PrettyXML call DoPrettyXML()set secure
 
 " PHP tags
 set tags=~/workspace/svn/lengow/php.tags
