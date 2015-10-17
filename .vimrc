@@ -37,6 +37,7 @@ Plugin 'vim-scripts/BufOnly.vim'
 Plugin 'chrisbra/csv.vim'
 Plugin 'Xuyuanp/nerdtree-git-plugin'
 Plugin 'kien/ctrlp.vim'
+Plugin 'c.vim'
 " Plugin 'jistr/vim-nerdtree-tabs'
 
 call vundle#end()
@@ -69,13 +70,6 @@ autocmd bufenter * if (winnr("$") == 1 && exists("b:NERDTreeType") && b:NERDTree
 let NERDTreeShowBookmarks=1
 " Mirroring between tabs
 let NERDTreeMirror=0
-
-" Ultisnips setup
-" ----------------------------------
-let g:UltiSnipsExpandTrigger = '<c-j>'
-let g:UltiSnipsListSnippets = '<c-tab>'
-let g:UltiSnipsJumpForwardTrigger = '<c-j>'
-let g:UltiSnipsJumpBackwardTrigger = '<c-k>'
 
 " Vim-indent-guides
 " ----------------------------------
@@ -111,6 +105,7 @@ let g:pymode_rope_completion = 0
 let g:pymode_breakpoint_cmd = 'import ipdb; ipdb.set_trace() # XXX BREAKPOINT'
 let g:pymode_lint = 0
 " let g:pymode_lint_write = 0
+let g:pymode = 0
 
 " Vim taggatron
 " ----------------------------------
@@ -118,11 +113,15 @@ let g:tagcommands = {
 \    "php" : {
 \        "tagfile" : "/home/sebastien/workspace/svn/lengow/php.tags",
 \        "args" : "-R",
-\        "files" : "/home/sebastien/workspace/svn/lengow/"
+\        "files" : "/home/sebastien/workspace/svn/lengow/",
+\    },
+\    "c" : {
+\        "tagfile" : "/home/sebastien/workspace/C/c.tags",
+\        "args" : "-R",
+\        "files" : "/home/sebastien/workspace/C/"
 \    }
 \}
 
-let g:pymode = 0
 " Signify setup
 " ----------------------------------
 nmap <leader>gj <plug>(signify-next-hunk)
@@ -131,6 +130,17 @@ nmap <leader>gk <plug>(signify-prev-hunk)
 " TagBar setup
 " ----------------------------------
 nmap <F8> :TagbarToggle<CR>
+
+" C.vim
+" ----------------------------------
+let g:C_UseToolcmake = 'yes'
+
+" Ultisnips setup
+" ----------------------------------
+let g:UltiSnipsExpandTrigger = '<c-j>'
+let g:UltiSnipsListSnippets = '<c-tab>'
+let g:UltiSnipsJumpForwardTrigger = '<c-h>'
+let g:UltiSnipsJumpBackwardTrigger = '<c-k>'
 
 " General
 " ----------------------------------
