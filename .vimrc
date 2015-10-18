@@ -33,13 +33,15 @@ Plugin 'scrooloose/syntastic'
 Plugin 'nathanaelkane/vim-indent-guides'
 Plugin 'mhinz/vim-signify'
 Plugin 'majutsushi/tagbar'
-Plugin 'joonty/vim-taggatron'
+"Plugin 'joonty/vim-taggatron'
 Plugin 'vim-scripts/BufOnly.vim'
 Plugin 'chrisbra/csv.vim'
 Plugin 'Xuyuanp/nerdtree-git-plugin'
 Plugin 'kien/ctrlp.vim'
 Plugin 'c.vim'
-" Plugin 'jistr/vim-nerdtree-tabs'
+Plugin 'scrooloose/nerdcommenter'
+Plugin 'xolox/vim-easytags'
+Plugin 'xolox/vim-misc'
 
 call vundle#end()
 filetype plugin indent on
@@ -65,10 +67,6 @@ set guifont=DejaVu\ Sans\ Mono\ for\ Powerline\ 10
 " -----------------------------------
 let g:ctrlp_map = '<c-p>'
 let g:ctrlp_cmd = 'CtrlP'
-
-" TagBar setup
-" ----------------------------------
-nmap <F8> :TagbarToggle<CR>
 
 " NERDTree setup
 " ----------------------------------
@@ -114,23 +112,21 @@ let g:pymode_folding = 1
 let g:pymode_rope_completion = 0
 let g:pymode_breakpoint_cmd = 'import ipdb; ipdb.set_trace() # XXX BREAKPOINT'
 let g:pymode_lint = 0
-" let g:pymode_lint_write = 0
-let g:pymode = 0
 
-" Vim taggatron
-" ----------------------------------
-let g:tagcommands = {
-\    "php" : {
-\        "tagfile" : "/home/sebastien/workspace/svn/lengow/php.tags",
-\        "args" : "-R",
-\        "files" : "/home/sebastien/workspace/svn/lengow/",
-\    },
-\    "c" : {
-\        "tagfile" : "/home/sebastien/workspace/C/c.tags",
-\        "args" : "-R",
-\        "files" : "/home/sebastien/workspace/C/"
-\    }
-\}
+"" Vim taggatron
+"" ----------------------------------
+"let g:tagcommands = {
+"\    "php" : {
+"\        "tagfile" : "/home/sebastien/workspace/svn/lengow/php.tags",
+"\        "args" : "-R",
+"\        "files" : "/home/sebastien/workspace/svn/lengow/",
+"\    },
+"\    "c" : {
+"\        "tagfile" : "/home/sebastien/workspace/C/c.tags",
+"\        "args" : "-R",
+"\        "files" : "/home/sebastien/workspace/C/"
+"\    }
+"\}
 
 " Signify setup
 " ----------------------------------
@@ -280,3 +276,16 @@ nnoremap <F4> :make!<cr>
 
 " Backspace correction
 set backspace=indent,eol,start
+
+" Breaking bad habit
+noremap <Up> <NOP>
+noremap <Down> <NOP>
+noremap <Left> <NOP>
+noremap <Right> <NOP>
+
+" easy-tags
+autocmd FileType * set tags=./.tags;,~/.vim/.vimtags
+set cpoptions+=d
+let g:easytags_file = '~/.vim/.vimtags'
+let g:easytags_dynamic_files = 2
+let g:easytags_async = 1
