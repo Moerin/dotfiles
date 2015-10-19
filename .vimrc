@@ -1,10 +1,11 @@
 " Vimrc configuration file
-" Version : 2015-09
-
+" Version : 2015-10
 " Vundle configuration
 "-----------------------------------
 set nocompatible
 filetype off
+
+exe 'set rtp+=' . $GOPATH . '/src/github.com/junegunn/fzf'
 
 set rtp+=~/.vim/bundle/Vundle.vim
 call vundle#begin()
@@ -37,11 +38,20 @@ Plugin 'majutsushi/tagbar'
 Plugin 'vim-scripts/BufOnly.vim'
 Plugin 'chrisbra/csv.vim'
 Plugin 'Xuyuanp/nerdtree-git-plugin'
-Plugin 'kien/ctrlp.vim'
-Plugin 'c.vim'
+Plugin 'tpope/vim-abolish'
+Plugin 'mileszs/ack.vim'
 Plugin 'scrooloose/nerdcommenter'
+Plugin 'evidens/vim-twig'
+Plugin 'junegunn/fzf'
+Plugin 'junegunn/fzf.vim'
+Plugin 'ryanoasis/vim-devicons'
 Plugin 'xolox/vim-easytags'
 Plugin 'xolox/vim-misc'
+Plugin 'benmills/vimux'
+
+"Plugin 'kien/ctrlp.vim'
+"Plugin 'joonty/vim-taggatron'
+"Plugin 'jistr/vim-nerdtree-tabs'
 
 call vundle#end()
 filetype plugin indent on
@@ -50,23 +60,25 @@ filetype plugin indent on
 " -----------------------------------
 set laststatus=2
 set statusline+=%{fugitive#statusline()}
-let g:ycm_global_ycm_extra_conf = '~/.vim/bundle/YouCompleteMe/.ycm_extra_conf.py'
-let g:ycm_collect_identifiers_from_tags_files = 1 " Let YCM read tags from
-" Ctags file
-let g:ycm_use_ultisnips_completer = 1 " Default 1, just ensure
-let g:ycm_seed_identifiers_with_syntax = 1 " Completion for programming
-" language's keyword
-let g:ycm_complete_in_comments = 1 " Completion in comments
-let g:ycm_complete_in_strings = 1 " Completion in strings
-let g:airline_powerline_fonts = 1 
+let g:airline_powerline_fonts=1
 let g:airline#extensions#tabline#enabled=1
 set t_Co=256
-set guifont=DejaVu\ Sans\ Mono\ for\ Powerline\ 10
+"set guifont=DejaVu\ Sans\ Mono\ for\ Powerline\ 10
+set guifont=Sauce\ Code\ Powerline\ Plus\ Nerd\ File\ Types\ Mono\ Plus\ Font\ Awesome\ Plus\ Octicons\ Plus\ Pomicons\ 10
+"set guifont=DroidSansMonoForPowerlinePlusNerdFileTypes 10
 
-" CtrlP setup
-" -----------------------------------
-let g:ctrlp_map = '<c-p>'
-let g:ctrlp_cmd = 'CtrlP'
+" Vimwiki setup
+" ----------------------------------
+let g:vimwiki_list=[{'path':'~/.vim/vimwiki'}]
+
+" Vimux setup
+" ----------------------------------
+map <Leader>ps :call VimuxRunCommand("v3; python manage.py shell;")
+map <Leader>vp :VimuxPromptCommand<CR>
+" Close vim tmux runner opened by VimuxRunCommand
+map <Leader>vq :VimuxCloseRunner<CR>
+" Interrupt any command running in the runner pane map
+map <Leader>vs :VimuxInterruptRunner<CR>
 
 " NERDTree setup
 " ----------------------------------
@@ -78,6 +90,10 @@ autocmd bufenter * if (winnr("$") == 1 && exists("b:NERDTreeType") && b:NERDTree
 let NERDTreeShowBookmarks=1
 " Mirroring between tabs
 let NERDTreeMirror=0
+
+" YouCompleteme
+" ----------------------------------
+let g:EclimCompletionMethod = 'omnifunc'
 
 " Vim-indent-guides
 " ----------------------------------
@@ -137,16 +153,62 @@ nmap <leader>gk <plug>(signify-prev-hunk)
 " ----------------------------------
 nmap <F8> :TagbarToggle<CR>
 
-" C.vim
+" FZF
 " ----------------------------------
-let g:C_UseToolcmake = 'yes'
+nmap <silent> <c-p> :FZF<CR>
 
-" Ultisnips setup
+nnoremap <silent> <Leader>C :call fzf#run({
+\   'source':
+\     map(split(globpath(&rtp, "colors/*.vim"), "\n"),
+\         "substitute(fnamemodify(v:val, ':t'), '\\..\\{-}$', '', '')"),
+\   'sink':    'colo',
+\   'options': '+m',
+\   'left':    30
+\ })<CR>
+
+function! s:buflist()
+  redir => ls
+  silent ls
+  redir END
+  return split(ls, '\n')
+endfunction
+
+function! s:bufopen(e)
+  execute 'buffer' matchstr(a:e, '^[ 0-9]*')
+endfunction
+
+nnoremap <silent> <Leader><Enter> :call fzf#run({
+\ 'source':  reverse(<sid>buflist()),
+\ 'sink':    function('<sid>bufopen'),
+\ 'options': '+m',
+\ 'down':    len(<sid>buflist()) + 2
+\ })<CR>
+
+command! FZFMru call fzf#run({
+\ 'source':  reverse(s:all_files()),
+\ 'sink':    'edit',
+\ 'options': '-m -x +s',
+\ 'down':    '40%' })
+
+function! s:all_files()
+  return extend(
+  \ filter(copy(v:oldfiles),
+  \        "v:val !~ 'fugitive:\\|NERD_tree\\|^/tmp/\\|.git/'"),
+  \ map(filter(range(1, bufnr('$')), 'buflisted(v:val)'), 'bufname(v:val)'))
+endfunction
+
+nnoremap <silent> <c-h> :FZFMru<CR> 
+
+" Vim easy-tags
 " ----------------------------------
-let g:UltiSnipsExpandTrigger = '<c-j>'
-let g:UltiSnipsListSnippets = '<c-tab>'
-let g:UltiSnipsJumpForwardTrigger = '<c-h>'
-let g:UltiSnipsJumpBackwardTrigger = '<c-k>'
+autocmd FileType * set tags=./.tags;,tags;,~/.vim/.vimtags
+set cpoptions+=d
+let g:easytags_file = '~/.vim/.vimtags'
+let g:easytags_dynamic_files = 2
+let g:easytags_async = 1
+let b:easytags_auto_highlight = 0
+let g:easytags_python_enabled = "always"
+set vbs=1
 
 " General
 " ----------------------------------
@@ -196,9 +258,6 @@ set cc=+1
 
 " Definition de l'affichage des caracteres invisibles avec 'set list'
 " set listchars=nbsp:
- 
-" Affichage surbrillance recherche
-set hlsearch
 
 " Affichage surbrillance recherche
 set hlsearch
@@ -268,16 +327,19 @@ endfunction
 command! PrettyXML call DoPrettyXML()set secure
 
 " PHP tags
-set tags=~/workspace/svn/lengow/php.tags
+set tags=~/workspace/svn/lengow/php.tags;~/workspace/pymarketplaces/python.tags
 
-" C compilation
-set makeprg=make\ -C\ ../build\ -j9
-nnoremap <F4> :make!<cr>
+" Vimgrep search
+nmap <F5> :Ack! 
 
 " Backspace correction
 set backspace=indent,eol,start
 
-" Breaking bad habit
+" Coloris en rouge les fins de ligne
+autocmd InsertEnter * syn clear EOLWS | syn match EOLWS excludenl /\s\+\%#\@!$/
+autocmd InsertLeave * syn clear EOLWS | syn match EOLWS excludenl /\s\+$/
+highlight EOLWS ctermbg=red guibg=red
+" Break bad habits!!
 noremap <Up> <NOP>
 noremap <Down> <NOP>
 noremap <Left> <NOP>
