@@ -71,6 +71,8 @@ source $ZSH/oh-my-zsh.sh
 # ssh
 # export SSH_KEY_PATH="~/.ssh/dsa_id"
 
+export TERM="xterm-256color"
+
 # Set personal aliases, overriding those provided by oh-my-zsh libs,
 # plugins, and themes. Aliases can be placed here, though oh-my-zsh
 # users are encouraged to define aliases within the ZSH_CUSTOM folder.
@@ -81,9 +83,16 @@ alias zshconfig="gvim ~/.zshrc"
 alias vimconfig="gvim ~/.vimrc"
 alias install="sudo apt-get install"
 alias work3="cd ~/workspace/Python/pyMarketplace-3.4; find . -name '*.pyc' -exec rm '{}' \;; workon pyMarket3.4;"
+alias gch="google-chrome"
 # alias ohmyzsh="mate ~/.oh-my-zsh"
 
 . $HOME/.shellrc.load
 
 ### Added by the Heroku Toolbelt
 export PATH="/usr/local/heroku/bin:$PATH"
+
+export GOPATH=$HOME/workspace/go
+export GOROOT=/usr/local/go
+export PATH=$PATH:$GOROOT/bin:$GOPATH/bin
+
+[ -f ~/.fzf.zsh ] && source ~/.fzf.zsh

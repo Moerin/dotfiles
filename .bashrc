@@ -160,3 +160,5 @@ export PROJECT_HOME=$HOME/workspace/Python
 source /usr/bin/virtualenvwrapper.sh
 
 [ -r "$HOME/.smartcd_config" ] && ( [ -n $BASH_VERSION ] || [ -n $ZSH_VERSION ] ) && source ~/.smartcd_config
+
+[ -f ~/.fzf.bash ] && source ~/.fzf.bash
